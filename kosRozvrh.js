@@ -1,3 +1,4 @@
+function generate(semesterEnd){
 //Call function after script loads
 function whenAvailable(name, callback) {
     var interval = 10; // ms
@@ -9,6 +10,21 @@ function whenAvailable(name, callback) {
         }
     }, interval);
 }
+
+function dateTimeToUntilString(time, utc) {
+        if (utc === void 0) { utc = true; }
+        var date = new Date(time);
+        return [
+            date.getUTCFullYear().toString().padStart(4, '0'),
+            (date.getUTCMonth() + 1).toString().padStart( 2, '0'),
+            date.getUTCDate().toString().padStart(2, '0'),
+            'T',
+            date.getUTCHours().toString().padStart( 2, '0'),
+            date.getUTCMinutes().toString().padStart( 2, '0'),
+            date.getUTCSeconds().toString().padStart( 2, '0'),
+            utc ? 'Z' : ''
+        ].join('');
+    };
 
 function dayFromPosition(listek) {
     let n = listek.offsetTop / 120;
@@ -100,7 +116,7 @@ function generateICal() {
         ev.endDate = ICAL.Time.fromString(ev.endDate.toString());
 
 		//Configure weekly
-        vevent.addPropertyWithValue('RRULE', 'FREQ=WEEKLY;BYDAY=' + dayFromPosition(locations[i]) + ';INTERVAL=1');
+	vevent.addPropertyWithValue('RRULE', 'FREQ=WEEKLY;BYDAY=' + dayFromPosition(locations[i]) + ';INTERVAL=1;UNTIL='+dateTimeToUntilString(semesterEnd));
 
         // Add the new component
         comp.addSubcomponent(vevent);
@@ -118,3 +134,4 @@ $("head").append('<script async defer type="text/javascript" src="https://unpkg.
 whenAvailable("ICAL", function(t) {
     generateICal();
 });
+}
